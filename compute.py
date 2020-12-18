@@ -1,14 +1,18 @@
+# Algorithm inspired heavily from explanations at https://www.rhyscitlema.com/algorithms/expression-parsing-algorithm/
+
 import math
+
 
 class NodeType:
     # Represents a specific type of node, either an operator (e.g. multiply, add, etc.) or an integer
     # precedence is used for order of operation
-    def __init__(self, value, precedence=None, run=None, allow_swaps=True, is_operator=True):
+    def __init__(self, value, precedence=None, run=None, allow_swaps=True, is_operator=True, right_associative=False):
         self.value = value
         self.precedence = precedence
         self.run = run
         self.allow_swaps = allow_swaps
         self.is_operator = is_operator
+        self.right_associative = right_associative
 
     def __repr__(self):
         return str(self.value)
@@ -33,7 +37,7 @@ operators = {
     "tan": NodeType("tan", allow_swaps=False, run=lambda _, __, r: math.tan(r)),
     "pi": make_number_type(math.pi),
     "e": make_number_type(math.e),
-    "^": NodeType("^", precedence=4, run=lambda _, l, r: l ** r)
+    "^": NodeType("^", precedence=4, right_associative=True, run=lambda _, l, r: l ** r)
 }
 
 
@@ -107,6 +111,16 @@ def insert_node(parent, new):
     new.parent = parent
 
 
+def should_move_active_up(active, new):
+    if not active:
+        return False
+    if not active.type.allow_swaps or not new.type.allow_swaps:
+        return False
+    if new.type.right_associative:
+        return active.type.precedence > new.type.precedence
+    else:
+        return active.type.precedence >= new.type.precedence
+
 def make_tree(nodes):
     root = Node(operators["("])
     active = root
@@ -122,9 +136,7 @@ def make_tree(nodes):
             pop_node(opening_node)
             active = opening_node.parent
         else:
-            while active \
-                    and active.type.allow_swaps \
-                    and node.type.allow_swaps and active.type.precedence >= node.type.precedence:
+            while should_move_active_up(active, node):
                 active = active.parent
             insert_node(active, node)
             active = node

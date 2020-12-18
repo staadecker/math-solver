@@ -34,6 +34,8 @@ class ComputeTests(unittest.TestCase):
             "2 + ((-1+1)*2)*2 ": 2,
             "1-1^2": 0,
             "-1^2": -1,
+            "4^2^3": 65536,
+            "6 / 3 * 2": 4
         }
 
         for expr, ans in cases.items():
