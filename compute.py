@@ -199,6 +199,19 @@ def parse(expr):
     return nodes
 
 
+def validate(nodes):
+    unclosed_brackets = 0
+    for node in nodes:
+        if node.type.value == "(":
+            unclosed_brackets += 1
+        if node.type.value == ")":
+            unclosed_brackets -= 1
+            if unclosed_brackets < 0:
+                raise Exception("Too many closing brackets.")
+    if unclosed_brackets != 0:
+        raise Exception("Too many opening brackets")
+
+
 def evaluate_node(node):
     if node is None:
         return None
@@ -206,5 +219,7 @@ def evaluate_node(node):
 
 
 def compute(equation):
-    root = make_tree(parse(equation))
+    nodes = parse(equation)
+    validate(nodes)
+    root = make_tree(nodes)
     return evaluate_node(root)
