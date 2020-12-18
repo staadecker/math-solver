@@ -18,6 +18,12 @@ class ComputeTests(unittest.TestCase):
             "5.3": 5.3,
             "2.5 + 2.5 * 2": 7.5,
             "sin(0.523598775)": 0.5,
+            "tan(1)": 1.557407725,
+            "cos(1)": 0.540302305,
+            "cos(pi)": -1,
+            "4^2": 16,
+            "4^(1/2)": 2,
+            "4^0.5": 2,
             # WHITE SPACE
             " 4 + 3 ": 7,
             # ORDER OF OPERATIONS
@@ -25,11 +31,13 @@ class ComputeTests(unittest.TestCase):
             "3*7+4": 25,
             "(3+4)*7/7": 7,
             "2 + ((1+1)*2)*2 ": 10,
-            "2 + ((-1+1)*2)*2 ": 2
+            "2 + ((-1+1)*2)*2 ": 2,
+            "1-1^2": 0,
+            "-1^2": -1,
         }
 
         for expr, ans in cases.items():
-            self.assertAlmostEqual(ans, compute(expr), 8)
+            self.assertAlmostEqual(ans, compute(expr), 8, msg=f"Failed case: {expr}={ans}")
 
     # def test_invalid_brackets(self):
     #     cases = ["(3", "((4+5)"]

@@ -2,6 +2,7 @@ from compute import compute, operators
 
 
 def print_supported_operators():
+    # Sort by precedence
     supported_operators = sorted(operators.values(), key=lambda op: op.precedence if op.precedence else -1)
     print("Supported Operators:", end=" ")
 

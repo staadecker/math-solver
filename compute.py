@@ -11,7 +11,7 @@ class NodeType:
         self.is_operator = is_operator
 
     def __repr__(self):
-        return self.value
+        return str(self.value)
 
     def __str__(self):
         return self.__repr__()
@@ -26,9 +26,14 @@ operators = {
     "+": NodeType("+", precedence=2, run=lambda _, l, r: l + r),
     "(": NodeType("(", allow_swaps=False),
     ")": NodeType(")"),
-    "-": NodeType("-", precedence=2, run=lambda _, l, r: l - r),
+    "-": NodeType("-", precedence=2, run=lambda _, l, r: l - r if l is not None else -r),
     "/": NodeType("/", precedence=3, run=lambda _, l, r: l / r),
-    "sin": NodeType("sin", allow_swaps=False, run=lambda _, __, r: math.sin(r))
+    "sin": NodeType("sin", allow_swaps=False, run=lambda _, __, r: math.sin(r)),
+    "cos": NodeType("cos", allow_swaps=False, run=lambda _, __, r: math.cos(r)),
+    "tan": NodeType("tan", allow_swaps=False, run=lambda _, __, r: math.tan(r)),
+    "pi": make_number_type(math.pi),
+    "e": make_number_type(math.e),
+    "^": NodeType("^", precedence=4, run=lambda _, l, r: l ** r)
 }
 
 
@@ -163,7 +168,8 @@ def make_node_from_string(value):
 
 
 def is_multi_character_node(character, previous_node):
-    return character not in operators or (character == "-" and (previous_node is None or previous_node.type.is_operator))
+    return character not in operators or (
+                character == "-" and previous_node is not None and previous_node.type.is_operator)
 
 
 def should_skip(c):
