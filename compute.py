@@ -24,7 +24,8 @@ operators = {
     "+": NodeType("+", precedence=2, run=lambda _, l, r: l + r),
     "(": NodeType("(", allow_swaps=False),
     ")": NodeType(")"),
-    "-": NodeType("-", precedence=2, run=lambda _, l, r: l - r)
+    "-": NodeType("-", precedence=2, run=lambda _, l, r: l - r),
+    "/": NodeType("/", precedence=3, run=lambda _, l, r: l / r)
 }
 
 
@@ -155,11 +156,11 @@ def make_node_from_string(value):
     if value in operators:
         return Node(operators[value])
     else:
-        return Node(make_number_type(int(value)))
+        return Node(make_number_type(float(value)))
 
 
 def is_multi_character_node(character, previous_node):
-    return character.isnumeric() or (character == "-" and (previous_node is None or previous_node.type.is_operator))
+    return character.isnumeric() or character == "." or (character == "-" and (previous_node is None or previous_node.type.is_operator))
 
 
 def should_skip(c):
@@ -167,14 +168,14 @@ def should_skip(c):
 
 
 # Converts a mathematical string into an ordered list of nodes that could then be connected together to form a tree.
-def pre_parse(expr):
+def parse(expr):
     nodes = []
     in_progress_node = []
-    for character in expr:
+    for character in expr.strip():
         # First deal with any in_progress nodes
         if in_progress_node:
             # If numeric we keep building the current node.
-            if character.isnumeric():
+            if character.isnumeric() or character == ".":
                 in_progress_node.append(character)
                 continue
             # Otherwise the current node is done and we append it to the list
@@ -202,5 +203,5 @@ def evaluate_node(node):
 
 
 def compute(equation):
-    root = make_tree(pre_parse(equation))
+    root = make_tree(parse(equation))
     return evaluate_node(root)
