@@ -1,3 +1,5 @@
+import math
+
 class NodeType:
     # Represents a specific type of node, either an operator (e.g. multiply, add, etc.) or an integer
     # precedence is used for order of operation
@@ -25,7 +27,8 @@ operators = {
     "(": NodeType("(", allow_swaps=False),
     ")": NodeType(")"),
     "-": NodeType("-", precedence=2, run=lambda _, l, r: l - r),
-    "/": NodeType("/", precedence=3, run=lambda _, l, r: l / r)
+    "/": NodeType("/", precedence=3, run=lambda _, l, r: l / r),
+    "sin": NodeType("sin", allow_swaps=False, run=lambda _, __, r: math.sin(r))
 }
 
 
@@ -160,7 +163,7 @@ def make_node_from_string(value):
 
 
 def is_multi_character_node(character, previous_node):
-    return character.isnumeric() or character == "." or (character == "-" and (previous_node is None or previous_node.type.is_operator))
+    return character not in operators or (character == "-" and (previous_node is None or previous_node.type.is_operator))
 
 
 def should_skip(c):
@@ -175,7 +178,7 @@ def parse(expr):
         # First deal with any in_progress nodes
         if in_progress_node:
             # If numeric we keep building the current node.
-            if character.isnumeric() or character == ".":
+            if character not in operators and not should_skip(character):
                 in_progress_node.append(character)
                 continue
             # Otherwise the current node is done and we append it to the list

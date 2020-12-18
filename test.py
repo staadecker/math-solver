@@ -1,5 +1,6 @@
 import unittest
 from compute import *
+import math
 
 
 class ComputeTests(unittest.TestCase):
@@ -13,9 +14,10 @@ class ComputeTests(unittest.TestCase):
             "5-6": -1,
             "5*-6": -30,
             "-3": -3,
-            "5/3": 1.666666666666666666,
+            "5/3": 1.666666666,
             "5.3": 5.3,
             "2.5 + 2.5 * 2": 7.5,
+            "sin(0.523598775)": 0.5,
             # WHITE SPACE
             " 4 + 3 ": 7,
             # ORDER OF OPERATIONS
@@ -27,7 +29,7 @@ class ComputeTests(unittest.TestCase):
         }
 
         for expr, ans in cases.items():
-            self.assertEqual(ans, compute(expr))
+            self.assertAlmostEqual(ans, compute(expr), 8)
 
     # def test_invalid_brackets(self):
     #     cases = ["(3", "((4+5)"]
