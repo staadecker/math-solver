@@ -1,10 +1,10 @@
 # Math Expression Solver
 
-As part of the Advent of Code competition, I wrote a parser and solver for math expressions.
+As part of the Advent of Code competition, I wrote a custom parser and solver for math expressions.
 The function  `compute.compute(expr)` takes in a string such as `"cos(-pi)"` and returns the result, `-1`.
 Running `main.py` allows you to type in expressions and immediately see the results.
 
-## The cool stuff (aka. implementation details)
+## Cool thing 1 (aka. the algorithm)
 
 The solver goes through 3 steps.
 
@@ -16,8 +16,8 @@ This is the most "algorithmic intensive" part and is based on [this](https://www
 
 3. Solve the expression by recursively traversing the binary tree.
 
-## The other cool stuff
+## Cool thing 2
 
-All the operations are specified in a list! This makes it really easy
+All the operations (e.g. *, /, sin, cos) are specified in a list! This makes it really easy
 to add new operations, or change the order of operations. Take a look at `operands`
 in `compute.py`.

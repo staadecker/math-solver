@@ -47,11 +47,12 @@ class ComputeTests(unittest.TestCase):
         for expr, ans in cases.items():
             self.assertAlmostEqual(ans, compute(expr), 8, msg=f"Failed case: {expr}={ans}")
 
-    # def test_invalid_brackets(self):
-    #     cases = ["(3", "((4+5)"]
-    #
-    #     for expr in cases:
-    #         self.assertRaises(NotImplementedError, compute(expr))
+    def test_invalid_brackets(self):
+        print("Ignore the following failure messages (unless in red) since we're testing failing cases:")
+        cases = ["(3", "((4+5)"]
+
+        for expr in cases:
+            self.assertRaises(Exception, lambda: compute(expr))
 
 
 if __name__ == '__main__':
