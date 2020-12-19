@@ -24,6 +24,8 @@ class ComputeTests(unittest.TestCase):
             "4^(1/2)": 2,
             "4^0.5": 2,
             "(3)-2": 1,
+            "3!^2": 36,
+            "5!+1": 121,
             # WHITE SPACE
             " 4 + 3 ": 7,
             # ORDER OF OPERATIONS
@@ -37,7 +39,8 @@ class ComputeTests(unittest.TestCase):
             "4^2^3": 65536,
             "6 / 3 * 2": 4,
             "cos(0)*2": 2,
-            "sin (pi/2) * 2": 2
+            "sin (pi/2) * 2": 2,
+            "-cos (-pi)": 1,
 
         }
 

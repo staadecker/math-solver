@@ -39,7 +39,8 @@ operators = {
     "tan": NodeType("tan", is_function=True, run=lambda _, __, r: math.tan(r)),
     "pi": make_number_type(math.pi),
     "e": make_number_type(math.e),
-    "^": NodeType("^", precedence=4, right_associative=True, run=lambda _, l, r: l ** r)
+    "^": NodeType("^", precedence=4, right_associative=True, run=lambda _, l, r: l ** r),
+    "!": NodeType("!", precedence=5, run=lambda _, l, __: math.factorial(l))
 }
 
 
@@ -123,6 +124,7 @@ def should_move_active_up(active, new):
     else:
         return active.type.precedence >= new.type.precedence
 
+
 def make_tree(nodes):
     root = Node(operators["("])
     active = root
@@ -138,8 +140,9 @@ def make_tree(nodes):
             pop_node(opening_node)
             active = opening_node.parent
         else:
-            while should_move_active_up(active, node):
-                active = active.parent
+            if not node.type.value == "-" or not active.type.is_operator:
+                while should_move_active_up(active, node):
+                    active = active.parent
             insert_node(active, node)
             active = node
         # print(active)
@@ -181,11 +184,6 @@ def make_node_from_string(value):
         return Node(make_number_type(float(value)))
 
 
-def is_multi_character_node(character, previous_node):
-    return character not in operators or (
-                character == "-" and previous_node is not None and previous_node.type.is_operator)
-
-
 def should_skip(c):
     return c == " "
 
@@ -205,9 +203,10 @@ def parse(expr):
             else:
                 nodes.append(make_node_from_string("".join(in_progress_node)))
                 in_progress_node = []  # Reset in_progress_node
+        node = nodes[-1] if nodes else None
         if should_skip(character):  # Skip whitespace
             continue
-        elif is_multi_character_node(character, nodes[-1] if nodes else None):
+        elif character not in operators:
             in_progress_node.append(character)
         else:
             nodes.append(make_node_from_string(character))
@@ -256,5 +255,7 @@ def compute(expression):
         print("Failed to computed expression: " + expression)
         raise e
 
+
 if __name__ == '__main__':
-    compute("cos(0)*2")
+    test_expr = "5*-6"
+    print(compute(test_expr))
