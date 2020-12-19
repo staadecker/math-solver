@@ -6,13 +6,15 @@ import math
 class NodeType:
     # Represents a specific type of node, either an operator (e.g. multiply, add, etc.) or an integer
     # precedence is used for order of operation
-    def __init__(self, value, precedence=None, run=None, allow_swaps=True, is_operator=True, right_associative=False):
+    def __init__(self, value, precedence=float("inf"), run=None, allow_swaps=True, is_operator=True, right_associative=False,
+                 is_function=False):
         self.value = value
         self.precedence = precedence
         self.run = run
         self.allow_swaps = allow_swaps
         self.is_operator = is_operator
         self.right_associative = right_associative
+        self.is_function = is_function
 
     def __repr__(self):
         return str(self.value)
@@ -22,19 +24,19 @@ class NodeType:
 
 
 def make_number_type(number):
-    return NodeType(number, precedence=8, is_operator=False, run=lambda p, _, __: p)
+    return NodeType(number, is_operator=False, run=lambda p, _, __: p)
 
 
 operators = {
     "*": NodeType("*", precedence=3, run=lambda _, l, r: l * r),
     "+": NodeType("+", precedence=2, run=lambda _, l, r: l + r),
     "(": NodeType("(", allow_swaps=False),
-    ")": NodeType(")"),
+    ")": NodeType(")", is_operator=False),
     "-": NodeType("-", precedence=2, run=lambda _, l, r: l - r if l is not None else -r),
     "/": NodeType("/", precedence=3, run=lambda _, l, r: l / r),
-    "sin": NodeType("sin", allow_swaps=False, run=lambda _, __, r: math.sin(r)),
-    "cos": NodeType("cos", allow_swaps=False, run=lambda _, __, r: math.cos(r)),
-    "tan": NodeType("tan", allow_swaps=False, run=lambda _, __, r: math.tan(r)),
+    "sin": NodeType("sin", is_function=True, run=lambda _, __, r: math.sin(r)),
+    "cos": NodeType("cos", is_function=True, run=lambda _, __, r: math.cos(r)),
+    "tan": NodeType("tan", is_function=True, run=lambda _, __, r: math.tan(r)),
     "pi": make_number_type(math.pi),
     "e": make_number_type(math.e),
     "^": NodeType("^", precedence=4, right_associative=True, run=lambda _, l, r: l ** r)
@@ -54,10 +56,10 @@ class Node:
         return self.__str__()
 
     def __str__(self):
-        left = id(self.left) if self.left else ""
-        right = id(self.right) if self.right else ""
-        parent = id(self.parent) if self.parent else ""
-        return f"V: {self.type.value} id: {id(self)} R: {right} L: {left} P: {parent}"
+        left = self.left.type.value if self.left else ""
+        right = self.right.type.value if self.right else ""
+        parent = self.parent.type.value if self.parent else ""
+        return f"{self.type.value} R: {right} L: {left} P: {parent}"
 
     def has_parent(self):
         return self.parent is not None
@@ -214,6 +216,14 @@ def parse(expr):
     if in_progress_node:
         nodes.append(make_node_from_string("".join(in_progress_node)))
 
+    # Add brackets around e.g. sin functions
+    i = 0
+    while i < len(nodes) - 1:
+        if nodes[i].type.is_function and nodes[i + 1].type.value != "(":
+            nodes.insert(i + 1, make_node_from_string("("))
+            nodes.insert(i + 3, make_node_from_string(")"))
+        i += 1
+
     return nodes
 
 
@@ -236,8 +246,15 @@ def evaluate_node(node):
     return node.type.run(node.type.value, evaluate_node(node.left), evaluate_node(node.right))
 
 
-def compute(equation):
-    nodes = parse(equation)
-    validate(nodes)
-    root = make_tree(nodes)
-    return evaluate_node(root)
+def compute(expression):
+    try:
+        nodes = parse(expression)
+        validate(nodes)
+        root = make_tree(nodes)
+        return evaluate_node(root)
+    except Exception as e:
+        print("Failed to computed expression: " + expression)
+        raise e
+
+if __name__ == '__main__':
+    compute("cos(0)*2")

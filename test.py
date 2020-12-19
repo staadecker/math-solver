@@ -1,7 +1,5 @@
 import unittest
 from compute import *
-import math
-
 
 class ComputeTests(unittest.TestCase):
     def test_valid(self):
@@ -21,9 +19,11 @@ class ComputeTests(unittest.TestCase):
             "tan(1)": 1.557407725,
             "cos(1)": 0.540302305,
             "cos(pi)": -1,
+            "cos pi": -1,
             "4^2": 16,
             "4^(1/2)": 2,
             "4^0.5": 2,
+            "(3)-2": 1,
             # WHITE SPACE
             " 4 + 3 ": 7,
             # ORDER OF OPERATIONS
@@ -35,7 +35,10 @@ class ComputeTests(unittest.TestCase):
             "1-1^2": 0,
             "-1^2": -1,
             "4^2^3": 65536,
-            "6 / 3 * 2": 4
+            "6 / 3 * 2": 4,
+            "cos(0)*2": 2,
+            "sin (pi/2) * 2": 2
+
         }
 
         for expr, ans in cases.items():
